@@ -1,0 +1,32 @@
+# Ignore the target directory where compiled files are stored
+/target/
+
+# If you use incremental compilation, Cargo stores intermediate files here
+**/target/**/incremental/
+
+# Ignore debug and release builds
+**/target/debug/
+**/target/release/
+
+# If you're using Rustup or other version managers, ignore the `.cargo` and `.rustup` directories
+.cargo/
+.rustup/
+
+# Ignore the Cargo.lock file for libraries, but not for binaries
+# (If this is a library, uncomment the line below)
+/Cargo.lock
+
+# Ignore the `node_modules` folder if using any JavaScript dependencies
+node_modules/
+
+# Ignore temporary editor files (Vim, Emacs, etc.)
+*~
+*.swp
+*.swo
+.*.un~
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore Visual Studio Code files
+.vscode/

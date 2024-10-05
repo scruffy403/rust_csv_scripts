@@ -1,0 +1,8 @@
+[package]
+name = "my_file_scripts"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chardet = "0.2"
+csv = "1.3"
