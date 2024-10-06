@@ -4,5 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chardet = "0.2"
-csv = "1.3"
+csv = "1.1"
+chardet = "0.2.0"
+
+[[bin]]
+name = "compare_csv"
+path = "src/bin/compare_csv.rs"
+
+[[bin]]
+name = "check_encoding"
+path = "src/bin/check_encoding.rs"
