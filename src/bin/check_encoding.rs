@@ -1,61 +1,27 @@
-// src/bin/check_encoding.rs
-
-//! Binary to check the encoding of a given file.
-
+use clap::{Arg, Command};
 use std::path::Path;
-use std::error::Error;
-use my_file_scripts::encoding::{detect_encoding, is_valid_utf8};
+use rust_csv_scripts::encoding::detect_encoding;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    println!("Enter the path to the file you want to check:");
+
+fn main() {
+    let matches = Command::new("check_encoding")
+        .about("Check the encoding of a file")
+        .arg(Arg::new("file")
+            .help("The file to check")
+            .required(true)
+            .value_parser(clap::value_parser!(String)))
+        .get_matches();
+
+    // Use `get_one` instead of `value_of`
+    let file_path = matches.get_one::<String>("file").unwrap();
     
-    // Read the file path from the user input.
-    let mut path_input = String::new();
-    std::io::stdin().read_line(&mut path_input)?;
-    let path = Path::new(path_input.trim());
-
-    // Detect encoding.
-    let (encoding, confidence) = match detect_encoding(path) {
-        Ok(result) => result,
-        Err(e) => {
-            println!("Error: {}", e);
-            return Ok(());
-        }
-    };
-
-    println!("Detected Encoding: {}", encoding);
-    println!("Confidence: {:.2}%", confidence * 100.0);
+    let path = Path::new(file_path);
     
-    // Additional checks based on the detected encoding.
-    if encoding == "ASCII" {
-        // Check for the presence of non-ASCII characters in an ASCII-detected file.
-        let mut non_ascii_count = 0;
-        for byte in std::fs::read(path)? {
-            if byte > 127 {
-                non_ascii_count += 1;
-            }
+    match detect_encoding(path) {
+        Ok((encoding, confidence)) => {
+            println!("Detected encoding: {}", encoding);
+            println!("Confidence: {:.2}%", confidence * 100.0);
         }
-        if non_ascii_count > 0 {
-            println!("Warning: The file contains non-ASCII characters but is detected as ASCII.");
-        } else {
-            println!("The file contains only ASCII characters.");
-        }
-    } else if encoding == "UTF-8" {
-        // Assume UTF-8 with BOM if BOM was detected.
-        if std::fs::read(path)?.starts_with(&[0xEF, 0xBB, 0xBF]) {
-            println!("The file uses UTF-8 with BOM.");
-        } else {
-            println!("The file uses UTF-8 without BOM.");
-        }
+        Err(e) => eprintln!("Error detecting encoding: {}", e),
     }
-
-    // Custom validation for UTF-8 content.
-    let buffer = std::fs::read(path)?;
-    if is_valid_utf8(&buffer) {
-        println!("The file is valid UTF-8.");
-    } else {
-        println!("The file is not valid UTF-8.");
-    }
-
-    Ok(())
 }

@@ -1,63 +1,8 @@
-// src/csv_compare.rs
-
 use std::error::Error;
 use std::collections::HashSet;
 use csv::{ReaderBuilder, WriterBuilder, StringRecord};
-
-/// Enum to represent file encoding options.
-#[derive(Debug)]
-pub enum Encoding {
-    Utf8,
-    Utf8Bom,
-}
-
-/// Compares the headers of two CSV files and prints any mismatches.
-///
-/// # Arguments
-///
-/// * `file1` - The path to the first CSV file.
-/// * `file2` - The path to the second CSV file.
-///
-/// # Errors
-///
-/// Returns an error if the files cannot be read or the headers are missing.
-pub fn compare_file_headers(file1: &str, file2: &str) -> Result<(), Box<dyn Error>> {
-    let mut reader1 = ReaderBuilder::new().from_path(file1)?;
-    let mut reader2 = ReaderBuilder::new().from_path(file2)?;
-
-    let headers1 = reader1.headers()?;
-    let headers2 = reader2.headers()?;
-
-    println!("Comparing headers:");
-
-    // Check if the number of columns matches.
-    if headers1.len() == headers2.len() {
-        println!("Both files have the same number of columns: {}", headers1.len());
-    } else {
-        println!(
-            "Files have different numbers of columns: {} vs {}",
-            headers1.len(),
-            headers2.len()
-        );
-    }
-
-    // Compare column names and print only mismatches.
-    let mut mismatch_found = false;
-    for (i, header1) in headers1.iter().enumerate() {
-        if let Some(header2) = headers2.get(i) {
-            if header1 != header2 {
-                println!("Column {} mismatch: '{}' does not match '{}'", i + 1, header1, header2);
-                mismatch_found = true;
-            }
-        }
-    }
-
-    if !mismatch_found {
-        println!("All column names match.");
-    }
-
-    Ok(())
-}
+use std::io::Write;
+use crate::encoding::Encoding;
 
 /// Compares rows between two CSV files, filters out ignored columns, and writes
 /// unique rows from `file1` to a new CSV file with the same headers.
@@ -86,19 +31,17 @@ pub fn compare_and_write_unique_rows(file1: &str, file2: &str, ignore_columns: &
         rows_in_file2.insert(filtered_record);
     }
 
-    // Create a writer for the new CSV file.
-    let output_file = format!("{}_modified.csv", file1.trim_end_matches(".csv"));
-    let mut writer = match encoding {
-        Encoding::Utf8 => WriterBuilder::new().from_path(&output_file)?,
-        Encoding::Utf8Bom => {
-            let mut writer = WriterBuilder::new().from_path(&output_file)?;
-            writer.flush()?;
-            let mut file = writer.into_inner()?;
-            use std::io::Write; // Ensure `Write` is in scope
-            file.write_all(b"\xEF\xBB\xBF")?; // Write BOM
-            WriterBuilder::new().from_writer(file)
-        }
-    };
+    // Prepare output file name and open writer
+    let output_file = format!("{}_modified.csv", file1.trim_end_matches(|c| c == '.' || c == 'c' || c == 's' || c == 'v' || c == 'C' || c == 'S' || c == 'V'));
+    
+    let mut writer = WriterBuilder::new().from_path(&output_file)?;
+    if let Encoding::Utf8Bom = encoding {
+        // Write BOM for UTF-8 with BOM
+        writer.flush()?;  // Ensure we have access to the writer
+        let mut file = writer.into_inner()?;
+        file.write_all(b"\xEF\xBB\xBF")?;
+        writer = WriterBuilder::new().from_writer(file);
+    }
 
     // Write the headers to the new CSV.
     let mut reader1 = ReaderBuilder::new().from_path(file1)?;

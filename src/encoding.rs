@@ -1,5 +1,3 @@
-// src/encoding.rs
-
 use std::{
     fs::File,
     io::{self, BufReader, Read},
@@ -48,18 +46,15 @@ pub fn detect_encoding(path: &Path) -> Result<(String, f64), io::Error> {
     let file = File::open(path)?;
     let mut reader = BufReader::new(file);
     
-    // Check for BOM (Byte Order Mark) by reading the first 3 bytes
+    // Read the first few bytes to check for BOM
     let mut bom_check = [0; 3];
-    let bom_present = reader.read(&mut bom_check)? > 0;
+    let bom_bytes_read = reader.read(&mut bom_check)?;
 
     // Check if BOM is present (UTF-8 BOM is "\xEF\xBB\xBF")
-    let is_utf8_bom = bom_present && &bom_check == b"\xEF\xBB\xBF";
+    let is_utf8_bom = bom_bytes_read == 3 && &bom_check == b"\xEF\xBB\xBF";
 
     // Read the rest of the file into a buffer
     let mut buffer = Vec::new();
-    if is_utf8_bom {
-        buffer.extend_from_slice(&bom_check);
-    }
     reader.read_to_end(&mut buffer)?;
 
     // Detect encoding using `chardet`
@@ -67,5 +62,12 @@ pub fn detect_encoding(path: &Path) -> Result<(String, f64), io::Error> {
     let encoding = detection.0;  // Detected encoding as a string
     let confidence = detection.1; // Confidence level of detection as a float
 
-    Ok((encoding.to_string(), confidence.into()))
+    // If BOM is detected, specify that in the result
+    let encoding = if is_utf8_bom {
+        "UTF-8 with BOM".to_string()
+    } else {
+        encoding.to_string()
+    };
+
+    Ok((encoding, confidence.into()))
 }

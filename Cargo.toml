@@ -1,11 +1,12 @@
 [package]
-name = "my_file_scripts"
+name = "rust_csv_scripts"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 csv = "1.1"
 chardet = "0.2.0"
+clap = { version = "4.0", features = ["derive"] }
 
 [[bin]]
 name = "compare_csv"
