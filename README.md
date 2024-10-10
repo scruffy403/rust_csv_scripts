@@ -22,9 +22,7 @@ This repository contains two Rust scripts for working with CSV files and detecti
 ```bash
   git clone https://github.com/scruffy403/rust_csv_scripts.git
 ```
-3. Run `cargo build`
-## Usage/Examples
-Call the script and provide the needed arguments in the command line. 
+Alternatively you can copy and paste all of the relevant code into your project. Ensure you copy the contents of `Cargo.toml` and copy the structure and code of the `src` folder and its sub folder `bin`. Then configure you `.ignore` file to ignore the `target`  and `debug` folders.
 
 ### Run compare_csv script
 
