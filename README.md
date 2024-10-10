@@ -14,7 +14,7 @@ This repository contains two Rust scripts for working with CSV files and detecti
    - Detects the encoding of a file and checks if it's valid UTF-8.
    - Provides detailed information about any non-UTF-8 characters.
 
-    ## Installation
+## Installation
 
 1. Install [Rust](https://www.rust-lang.org/).
 2. Clone this repository:
