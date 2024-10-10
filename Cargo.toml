@@ -2,11 +2,14 @@
 name = "rust_csv_scripts"
 version = "0.1.0"
 edition = "2021"
+default-run = "rust_csv_scripts"
 
 [dependencies]
 csv = "1.1"
 chardet = "0.2.0"
 clap = { version = "4.0", features = ["derive"] }
+egui = "0.22"
+eframe = "0.22"
 
 [[bin]]
 name = "compare_csv"

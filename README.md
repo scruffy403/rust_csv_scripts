@@ -37,3 +37,9 @@ cargo run --bin compare_csv -- <path_to_file1> <path_to_file2> --ignore <ignored
 ```bash
 cargo run --bin check_encoding -- <path_to_file>
 ```
+
+### Run the GUI
+
+```bash
+cargo run --bin rust_csv_scripts -- --use_gui gui
+```

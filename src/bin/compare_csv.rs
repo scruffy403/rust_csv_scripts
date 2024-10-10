@@ -1,7 +1,9 @@
+// src/bin/compare_csv.rs
+
 use clap::{Arg, Command};
 use std::collections::HashSet;
-use rust_csv_scripts::csv_compare::compare_and_write_unique_rows;
-use rust_csv_scripts::encoding::Encoding;
+use rust_csv_scripts::{compare_csv}; // Import the compare_csv function from lib.rs
+use rust_csv_scripts::encoding::Encoding; // Import the Encoding enum
 
 fn main() {
     let matches = Command::new("compare_csv")
@@ -47,8 +49,8 @@ fn main() {
         HashSet::new()
     };
 
-    // Call the CSV comparison function
-    if let Err(e) = compare_and_write_unique_rows(file1, file2, &ignore_columns, encoding) {
+    // Call the CSV comparison function from lib.rs
+    if let Err(e) = compare_csv(file1, file2, encoding, &ignore_columns.iter().map(|s| s.as_str()).collect::<Vec<_>>()) {
         eprintln!("Error comparing files: {}", e);
     }
 }
