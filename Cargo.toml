@@ -10,6 +10,7 @@ chardet = "0.2.0"
 clap = { version = "4.0", features = ["derive"] }
 egui = "0.22"
 eframe = "0.22"
+rfd = "0.13.0"
 
 [[bin]]
 name = "compare_csv"
